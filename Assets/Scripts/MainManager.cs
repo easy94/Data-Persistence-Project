@@ -12,6 +12,8 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public Text OverallScore;
+    
     
     private bool m_Started = false;
     private int m_Points;
@@ -22,6 +24,12 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //username and highscore overall better than saved persistance save only viewing
+        if(m_Points >= M.instance.bestscore)
+        OverallScore.text = "Best Score: " + M.instance.username + " " + M.instance.score;
+        else OverallScore.text = "Best Score: " + M.instance.bestuser + " " + M.instance.bestscore;
+
+        m_Points = M.instance.score;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -55,6 +63,7 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            SaveHighscore();
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -65,12 +74,29 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"Score :" + m_Points;
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+    void SaveHighscore()
+    {
+        if (m_Points >= M.instance.bestscore)
+        {
+            M.instance.bestscore = m_Points;
+            M.instance.bestuser = M.instance.username;
+            M.instance.score = m_Points;
+        }
+
+        M.instance.score = m_Points;
+
+    }
+
+   public void ToMenu()
+    {
+        SceneManager.LoadScene("menu");
     }
 }
